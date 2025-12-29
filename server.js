@@ -14,8 +14,11 @@ const app = express();
 // Middleware
 app.use(express.json());
 
-// Serve static files from public directory
-app.use(express.static('public'));
+// Serve static files from dist directory (React build) in production
+// In development, Vite dev server handles static files
+if (process.env.NODE_ENV === 'production') {
+  app.use(express.static('dist'));
+}
 
 // Initialize database
 try {

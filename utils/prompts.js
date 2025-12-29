@@ -208,6 +208,7 @@ LANGUAGE RULE (STRICT)
 ========================
 - Match the response language to the CURRENT user message.
 - English input → English response.
+- Hindi input → Hindi response.
 - Hinglish input → Hinglish response.
 - Do NOT depend on previous conversation language.
 - Do NOT mix English and Hinglish in the same response.

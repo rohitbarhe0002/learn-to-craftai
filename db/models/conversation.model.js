@@ -53,7 +53,7 @@ export async function saveUserMessage(conversationId, content, intent = null) {
 }
 
 /**
- * Saves an assistant message to the database
+ * Saves an assistant message to the database 
  * @param {string} conversationId - Conversation ID
  * @param {string} content - Message content
  * @param {string} responseType - Response type (optional)
