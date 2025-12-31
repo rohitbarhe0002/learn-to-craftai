@@ -3,7 +3,8 @@ import {
   buildIntentDetectionPrompt,
   buildDiseaseInformationPrompt,
   buildConversationalResponsePrompt,
-  getFallbackResponse 
+  getFallbackResponse,
+  getDownloadReportResponse 
 } from '../utils/prompts.js';
 import { hasValidGrounding, parseAIResponse } from '../utils/responseParser.js';
 import { 
@@ -94,6 +95,17 @@ export async function processChatRequest(userMessage, conversationId = null, use
     conversationId: currentConversationId,
     intent: detectedIntent 
   });
+
+  // Handle download_report intent immediately (no AI call needed)
+  if (detectedIntent === 'download_report') {
+    logInfo('Download report requested', { conversationId: currentConversationId });
+    const downloadResponse = getDownloadReportResponse();
+    await saveAssistantMessage(currentConversationId, JSON.stringify(downloadResponse), 'download_report');
+    return {
+      conversation_id: currentConversationId,
+      response: downloadResponse
+    };
+  }
 
   // Step 2: Generate response based on intent
   let responsePrompt;

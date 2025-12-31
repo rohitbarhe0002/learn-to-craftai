@@ -75,7 +75,7 @@ const Chat = forwardRef(function Chat({ isPending = false }, ref) {
                         case 'error':
                             return <ErrorMessage key={key} errorText={message.errorText} />;
                         case 'assistant':
-                            return <AssistantMessage key={key} data={message.data} />;
+                            return <AssistantMessage key={key} data={message.data} allMessages={optimisticMessages} />;
                         default:
                             return null;
                     }

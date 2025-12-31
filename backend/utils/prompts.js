@@ -113,6 +113,7 @@ POSSIBLE INTENTS
 7. "medicine_information" - User is asking about a tablet, medicine, uses, side effects
 8. "medicine_and_dosage_request"
    - User is asking which medicine to take AND how much dose to take
+9. "download_report" - User wants to download, save, export, or get a PDF/report of their consultation
 
 
 ========================
@@ -130,6 +131,15 @@ INTENT DETECTION RULES
     • "please suggest medicine and dose"
     • "how much dose should I take?"
   → medicine_and_dosage_request
+- If user asks:
+    • "download my report"
+    • "I want to download report"
+    • "give me PDF"
+    • "export consultation"
+    • "save report"
+    • "download prescription"
+    • "get my report"
+  → download_report
 ========================
 CONVERSATION HISTORY
 ========================
@@ -249,6 +259,19 @@ USER MESSAGE
 ${userMessage}`;
 
   return prompt;
+}
+
+/**
+ * Builds download report response
+ * @returns {Object} Download report response object
+ */
+export function getDownloadReportResponse() {
+  return {
+    type: 'download_report',
+    message: 'Your consultation report is ready! Click the button below to download your health consultation report as a PDF.',
+    buttonText: 'Download Report',
+    note: 'This report contains a summary of your consultation for your personal records.'
+  };
 }
 
 /**

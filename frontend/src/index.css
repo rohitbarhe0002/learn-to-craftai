@@ -228,6 +228,39 @@
     line-height: var(--line-height);
   }
 
+  /* Download Report Styles - Simple & Minimal */
+  .download-report-container {
+    @apply flex items-center gap-md py-sm;
+  }
+
+  .download-icon {
+    @apply text-xl;
+  }
+
+  .download-message {
+    @apply text-text-secondary text-sm flex-1;
+  }
+
+  .download-button {
+    @apply flex items-center gap-xs bg-transparent text-accent-primary text-sm font-medium py-xs px-md rounded border border-accent-primary cursor-pointer transition-all duration-150;
+  }
+
+  .download-button:hover {
+    @apply bg-accent-primary text-white;
+  }
+
+  .download-button:active {
+    opacity: 0.8;
+  }
+
+  .download-button-icon {
+    @apply text-sm;
+  }
+
+  .download-note {
+    display: none;
+  }
+
   /* Typing Indicator */
   .typing-indicator {
     @apply flex gap-1 py-lg px-xl bg-bg-assistant-message border border-border-light rounded-lg rounded-bl-sm;
@@ -365,6 +398,43 @@
     to {
       opacity: 1;
       transform: translateY(0);
+    }
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes bounceIn {
+    0% {
+      opacity: 0;
+      transform: scale(0.3);
+    }
+    50% {
+      transform: scale(1.1);
+    }
+    70% {
+      transform: scale(0.9);
+    }
+    100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  @keyframes downloadPulse {
+    0%, 100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(3px);
     }
   }
 
