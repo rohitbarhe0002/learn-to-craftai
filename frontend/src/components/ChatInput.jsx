@@ -78,7 +78,7 @@ export default function ChatInput({ isPending = false }) {
                     aria-label="Message input"
                     style={{ opacity: isLoading ? 0.6 : 1 }}
                 />
-                <div onClick={handleSubmit}>
+                <div className='pb-xs' onClick={handleSubmit}>
                     <SubmitButton disabled={!message.trim()} />
                 </div>
             </div>
