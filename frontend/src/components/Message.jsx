@@ -1,4 +1,5 @@
 import { markdownToHTML } from '../utils/markdown';
+import { generateHealthReport, extractReportData } from '../utils/reportGenerator';
 
 export function UserMessage({ text }) {
     return (
@@ -24,11 +25,35 @@ export function ErrorMessage({ errorText }) {
     );
 }
 
-export function AssistantMessage({ data }) {
+export function AssistantMessage({ data, allMessages = [] }) {
     const assistantContent = [];
     
-    // Check if this is a fallback response (has 'message' field)
-    if (data.message) {
+    // Handle download report response - Simple inline style
+    if (data.type === 'download_report') {
+        const handleDownload = () => {
+            const reportData = extractReportData(allMessages);
+            generateHealthReport(reportData);
+        };
+        
+        return (
+            <div className="message assistant">
+                <div className="message-avatar">AI</div>
+                <div className="message-content">
+                    <div className="message-bubble">
+                        <div className="download-report-container">
+                            <span className="download-message">Your report is ready.</span>
+                            <button className="download-button" onClick={handleDownload}>
+                                Download PDF
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+    
+    // Check if this is a fallback response (has 'message' field but not download_report type)
+    if (data.message && !data.type) {
         assistantContent.push(
             <div key="fallback" className="disease-description">{data.message}</div>
         );
