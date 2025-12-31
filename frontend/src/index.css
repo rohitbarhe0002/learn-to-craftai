@@ -273,24 +273,28 @@
 
   /* Input Container */
   .input-container {
-    @apply bg-bg-primary border-t border-border-light py-xl px-xl pb-lg sticky bottom-0 z-[100];
+    @apply bg-bg-primary border-t border-border-light py-sm px-xs pb-lg pt-lg sticky bottom-0 z-[100];
     backdrop-filter: blur(20px);
     background: rgba(15, 15, 15, 0.85);
     box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
   }
 
   .input-wrapper {
-    @apply max-w-[768px] mx-auto flex items-end gap-md bg-bg-secondary border-[1.5px] border-border-color rounded-xl py-md px-lg;
+    @apply max-w-[768px] mx-auto flex items-end gap-md bg-bg-secondary border-[1.5px] border-border-color rounded-xl pt-xs pb-xs py-sm px-lg;
     transition: all var(--transition-normal);
-    box-shadow: var(--shadow-md);
+    /* box-shadow: var(--shadow-md); */
   }
 
   .input-wrapper:focus-within {
     @apply border-accent-primary;
-    box-shadow: 0 0 0 3px rgba(16, 163, 127, 0.15), var(--shadow-lg);
-    background: var(--bg-tertiary);
+     border-color: var(--border-border-color);
+  background: var(--bg-tertiary);
   }
-
+.message-input:focus {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
   .message-input {
     @apply flex-1 bg-transparent border-none text-text-primary font-sans text-base resize-none outline-none max-h-[200px] overflow-y-auto;
     line-height: var(--line-height);
