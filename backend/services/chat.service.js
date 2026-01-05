@@ -126,7 +126,6 @@ export async function processChatRequest(userMessage, conversationId = null, use
       detectedIntent
     );
 
-    // Skip grounding check for greetings (no medical info needed)
     const requiresGrounding = responseType !== 'greeting';
     
     if (requiresGrounding && !hasValidGrounding(result.groundingMetadata)) {
