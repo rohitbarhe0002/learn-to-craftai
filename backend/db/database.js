@@ -239,3 +239,151 @@ export async function getConversationHistory(conversationId, limit = 20) {
   });
 }
 
+/**
+ * Retrieves all conversations with their first user message as title
+ * @param {number} limit - Maximum number of conversations to retrieve (default: 50)
+ * @returns {Promise<Array<{id: string, title: string, created_at: string}>>} Array of conversations
+ */
+export async function getAllConversations(limit = 50) {
+  return new Promise((resolve, reject) => {
+    if (!db) {
+      reject(new Error('Database not initialized'));
+      return;
+    }
+
+    db.all(
+      `SELECT 
+        c.id,
+        c.created_at,
+        (
+          SELECT content 
+          FROM messages m 
+          WHERE m.conversation_id = c.id AND m.role = 'user' 
+          ORDER BY m.created_at ASC 
+          LIMIT 1
+        ) as first_message
+       FROM conversations c
+       WHERE EXISTS (SELECT 1 FROM messages m WHERE m.conversation_id = c.id)
+       ORDER BY c.created_at DESC
+       LIMIT ?`,
+      [limit],
+      (err, rows) => {
+        if (err) {
+          logError('Error fetching all conversations', err);
+          reject(err);
+          return;
+        }
+        
+        const conversations = (rows || []).map(row => ({
+          id: row.id,
+          title: row.first_message 
+            ? (row.first_message.length > 50 
+                ? row.first_message.substring(0, 50) + '...' 
+                : row.first_message)
+            : 'New Conversation',
+          created_at: row.created_at
+        }));
+        
+        resolve(conversations);
+      }
+    );
+  });
+}
+
+/**
+ * Retrieves a conversation with all its messages
+ * @param {string} conversationId - Conversation ID
+ * @returns {Promise<{id: string, messages: Array, created_at: string}|null>} Conversation with messages or null
+ */
+export async function getConversationWithMessages(conversationId) {
+  return new Promise((resolve, reject) => {
+    if (!db) {
+      reject(new Error('Database not initialized'));
+      return;
+    }
+
+    db.get(
+      `SELECT id, name, age, gender, created_at FROM conversations WHERE id = ?`,
+      [conversationId],
+      (err, conversation) => {
+        if (err) {
+          logError('Error fetching conversation', err, { conversationId });
+          reject(err);
+          return;
+        }
+        
+        if (!conversation) {
+          resolve(null);
+          return;
+        }
+
+        db.all(
+          `SELECT role, content, intent, response_type, created_at 
+           FROM messages 
+           WHERE conversation_id = ? 
+           ORDER BY created_at ASC`,
+          [conversationId],
+          (err, messages) => {
+            if (err) {
+              logError('Error fetching conversation messages', err, { conversationId });
+              reject(err);
+              return;
+            }
+            
+            resolve({
+              id: conversation.id,
+              userDetails: {
+                name: conversation.name,
+                age: conversation.age,
+                gender: conversation.gender
+              },
+              messages: messages || [],
+              created_at: conversation.created_at
+            });
+          }
+        );
+      }
+    );
+  });
+}
+
+/**
+ * Deletes a conversation and all its messages
+ * @param {string} conversationId - Conversation ID
+ * @returns {Promise<boolean>} True if deleted, false if not found
+ */
+export async function deleteConversation(conversationId) {
+  return new Promise((resolve, reject) => {
+    if (!db) {
+      reject(new Error('Database not initialized'));
+      return;
+    }
+
+    db.run(
+      `DELETE FROM messages WHERE conversation_id = ?`,
+      [conversationId],
+      (err) => {
+        if (err) {
+          logError('Error deleting messages', err, { conversationId });
+          reject(err);
+          return;
+        }
+
+        db.run(
+          `DELETE FROM conversations WHERE id = ?`,
+          [conversationId],
+          function(err) {
+            if (err) {
+              logError('Error deleting conversation', err, { conversationId });
+              reject(err);
+              return;
+            }
+            
+            resolve(this.changes > 0);
+          }
+        );
+      }
+    );
+  });
+}
+

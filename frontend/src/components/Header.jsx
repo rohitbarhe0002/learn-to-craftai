@@ -1,7 +1,16 @@
-export default function Header() {
+export default function Header({ onToggleSidebar }) {
     return (
         <header className="chat-header">
             <div className="header-content">
+                <button 
+                    className="sidebar-toggle"
+                    onClick={onToggleSidebar}
+                    title="Toggle sidebar"
+                >
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M3 12H21M3 6H21M3 18H21" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                    </svg>
+                </button>
                 <h1 className="app-title">AI Health Assistant</h1>
                 <div 
                     className="disclaimer-icon" 
