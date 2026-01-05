@@ -18,11 +18,6 @@ import {
 import { config } from '../utils/config.js';
 import { logInfo, logError, logDebug, logWarn } from '../utils/logger.js';
 
-/**
- * Chat Service
- * Business logic for chat operations
- * Orchestrates AI processing, validation, and data persistence
- */
 
 /**
  * Processes a conversational chat request and returns AI-generated response
@@ -39,7 +34,6 @@ export async function processChatRequest(userMessage, conversationId = null, use
     messageLength: userMessage.length 
   });
 
-  // Create or use existing conversation
   let currentConversationId = conversationId;
   if (!currentConversationId) {
     logDebug('Creating new conversation', { hasUserDetails: !!userDetails });
@@ -50,17 +44,14 @@ export async function processChatRequest(userMessage, conversationId = null, use
     await ensureConversationExists(currentConversationId);
   }
 
-  // Get user details for the conversation (if they exist)
   const conversationUserDetails = await getConversationUserDetails(currentConversationId);
 
-  // Fetch conversation history (last 20 messages for context)
   const history = await getConversationHistory(currentConversationId, 20);
   logDebug('Conversation history fetched', { 
     conversationId: currentConversationId,
     historyLength: history.length 
   });
 
-  // Step 1: Detect user intent
   let detectedIntent = 'disease_information';
   let intentReasoning = '';
   try {
@@ -89,14 +80,12 @@ export async function processChatRequest(userMessage, conversationId = null, use
     detectedIntent = 'disease_information';
   }
 
-  // Save user message with intent
   await saveUserMessage(currentConversationId, userMessage, detectedIntent);
   logDebug('User message saved with intent', { 
     conversationId: currentConversationId,
     intent: detectedIntent 
   });
 
-  // Handle download_report intent immediately (no AI call needed)
   if (detectedIntent === 'download_report') {
     logInfo('Download report requested', { conversationId: currentConversationId });
     const downloadResponse = getDownloadReportResponse();
@@ -107,7 +96,6 @@ export async function processChatRequest(userMessage, conversationId = null, use
     };
   }
 
-  // Step 2: Generate response based on intent
   let responsePrompt;
   let responseType;
 
@@ -125,7 +113,6 @@ export async function processChatRequest(userMessage, conversationId = null, use
     responseType 
   });
 
-  // Process AI request in worker thread with history
   let aiResponse;
   try {
     const result = await processAIRequest(
@@ -135,7 +122,6 @@ export async function processChatRequest(userMessage, conversationId = null, use
       detectedIntent
     );
 
-    // Verify grounding metadata exists
     if (!hasValidGrounding(result.groundingMetadata)) {
       logWarn('Invalid or missing grounding metadata', { conversationId: currentConversationId });
       aiResponse = getFallbackResponse(userMessage);
@@ -146,7 +132,6 @@ export async function processChatRequest(userMessage, conversationId = null, use
         aiResponse = parseAIResponse(result.text);
         logDebug('AI response parsed successfully');
         
-        // Filter response to only include required fields for disease_information
         if (responseType === 'disease_information') {
           const filteredResponse = {};
           if (aiResponse.disease) filteredResponse.disease = aiResponse.disease;
@@ -156,10 +141,8 @@ export async function processChatRequest(userMessage, conversationId = null, use
           aiResponse = filteredResponse;
           logDebug('Response filtered to include only required fields');
         } else {
-          // For conversational responses, only keep the response field (no sources)
           const filteredResponse = {};
           if (aiResponse.response) filteredResponse.response = aiResponse.response;
-          // Remove sources_Link if present
           if (aiResponse.sources_Link) {
             delete aiResponse.sources_Link;
           }
@@ -178,7 +161,6 @@ export async function processChatRequest(userMessage, conversationId = null, use
     responseType = 'fallback';
   }
 
-  // Save assistant response with response type
   await saveAssistantMessage(currentConversationId, JSON.stringify(aiResponse), responseType);
   logInfo('Chat request processed successfully', { 
     conversationId: currentConversationId,

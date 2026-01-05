@@ -1,8 +1,3 @@
-/**
- * Error Handler Utilities
- * Provides try-catch decorators and error handling helpers
- */
-
 import { logError } from './logger.js';
 
 /**

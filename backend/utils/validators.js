@@ -11,7 +11,6 @@
 export function validateChatRequest(body) {
   const { disease, conversation_id, name, age, gender } = body;
 
-  // Disease is required
   if (!disease || typeof disease !== 'string' || disease.trim().length === 0) {
     return {
       valid: false,
@@ -19,7 +18,6 @@ export function validateChatRequest(body) {
     };
   }
 
-  // Conversation ID is optional, but if provided should be a string
   if (conversation_id !== undefined && conversation_id !== null && typeof conversation_id !== 'string') {
     return {
       valid: false,
@@ -27,7 +25,6 @@ export function validateChatRequest(body) {
     };
   }
 
-  // User details are optional, but if provided should be valid
   if (name !== undefined && name !== null && typeof name !== 'string') {
     return {
       valid: false,
@@ -66,7 +63,6 @@ export function normalizeUserInput(body) {
     conversation_id: body.conversation_id || null
   };
 
-  // Include user details if provided (only for new conversations)
   if (!result.conversation_id && (body.name || body.age || body.gender)) {
     result.userDetails = {
       name: body.name ? body.name.trim() : null,

@@ -1,11 +1,4 @@
 /**
- * Prompt templates for AI interactions
- * Centralizes all prompt construction logic
- * Uses DRY principle - common parts extracted into helper functions
- */
-
-
-/**
  * Returns common mandatory rules for all health prompts
  * @returns {string} Mandatory rules section
  */

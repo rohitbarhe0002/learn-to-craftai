@@ -11,7 +11,6 @@ export async function sendMessage(userMessage, conversationId = null) {
         disease: userMessage.trim(),
     };
     
-    // Include conversation ID if available
     if (conversationId) {
         requestBody.conversation_id = conversationId;
     }
@@ -31,7 +30,6 @@ export async function sendMessage(userMessage, conversationId = null) {
     
     const data = await response.json();
     
-    // Validate response structure
     if (!data.response) {
         throw new Error('Invalid API response: missing response field');
     }

@@ -7,7 +7,6 @@ export default {
   theme: {
     extend: {
       colors: {
-        // ChatGPT-Style Dark Theme Colors
         'bg-primary': '#0f0f0f',
         'bg-secondary': '#171717',
         'bg-tertiary': '#1f1f1f',

@@ -3,10 +3,6 @@ import Chat from './Chat';
 import ChatInput from './ChatInput';
 import { sendMessage as apiSendMessage } from '../utils/api';
 
-/**
- * ChatWrapper - Uses React 19 useActionState for form handling
- * No useState needed for loading state - useActionState handles it!
- */
 export default function ChatWrapper() {
     const chatRef = useRef(null);
     const lastMessageRef = useRef('');
@@ -28,7 +24,6 @@ export default function ChatWrapper() {
                     conversationId: result.conversationId || previousState.conversationId,
                 };
             } catch (error) {
-                // Add error message
                 chatRef.current?.addErrorMessage(
                     trimmedMessage,
                     error.message || 'Failed to send message'

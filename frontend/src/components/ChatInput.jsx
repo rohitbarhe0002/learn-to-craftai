@@ -1,10 +1,6 @@
 import { useState, useRef } from 'react';
 import { useFormStatus } from 'react-dom';
 
-/**
- * Submit Button - Uses React 19 useFormStatus
- * Must be a separate component inside <form> to use useFormStatus
- */
 function SubmitButton({ disabled }) {
     const { pending } = useFormStatus();
     return (
@@ -25,7 +21,6 @@ export default function ChatInput({ isPending = false }) {
     const [message, setMessage] = useState('');
     const textareaRef = useRef(null);
     
-    // React 19: useFormStatus reads pending state from parent <form>
     const { pending } = useFormStatus();
     const isLoading = pending || isPending;
     
