@@ -6,11 +6,6 @@ import { logError, logDebug } from '../utils/logger.js';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 /**
- * AI Service
- * Handles all AI-related operations including worker thread management
- */
-
-/**
  * Detects user intent using Gemini API in a worker thread
  * @param {string} intentPrompt - Intent detection prompt
  * @param {string} apiKey - Gemini API key

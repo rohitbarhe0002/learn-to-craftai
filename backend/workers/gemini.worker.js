@@ -20,7 +20,6 @@ async function processGeminiRequest() {
     const model = genAI.getGenerativeModel({ model: config.geminiModel });
 
     if (task === 'detect_intent') {
-      // Intent detection task
       const intentPrompt = prompt;
       const response = await model.generateContent({
         contents: [{ role: 'user', parts: [{ text: intentPrompt }] }],
@@ -36,11 +35,9 @@ async function processGeminiRequest() {
       parentPort.postMessage({ text, task: 'intent' });
 
     } else if (task === 'generate_response') {
-      // Response generation task
       const responsePrompt = prompt;
       const contents = [];
 
-      // Add conversation history if available
       if (history && Array.isArray(history) && history.length > 0) {
         history.forEach((msg) => {
           contents.push({
@@ -50,13 +47,11 @@ async function processGeminiRequest() {
         });
       }
 
-      // Add current prompt
       contents.push({
         role: 'user',
         parts: [{ text: responsePrompt }]
       });
 
-      // Generate content with Google Search grounding
       const response = await model.generateContent({
         contents: contents,
         tools: [{ google_search: {} }]
@@ -89,6 +84,5 @@ async function processGeminiRequest() {
   }
 }
 
-// Execute the Gemini request
 processGeminiRequest();
 

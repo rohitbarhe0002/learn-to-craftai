@@ -2,10 +2,13 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import express from 'express';
+import dotenv from 'dotenv';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+dotenv.config({ path: path.resolve(__dirname, '.env') });
 const isProduction = process.env.NODE_ENV === 'production';
-const PORT = process.env.PORT || 5173;
+const PORT = process.env.VITE_PORT || process.env.PORT || 3000
+const APP_NAME = process.env.VITE_APP_NAME || 'AI Health Support';
 
 async function createServer() {
   const app = express();
@@ -15,7 +18,6 @@ async function createServer() {
   let render;
 
   if (isProduction) {
-    // Production: serve built assets
     app.use(express.static(path.resolve(__dirname, 'dist/client'), { index: false }));
     
     template = fs.readFileSync(path.resolve(__dirname, 'dist/client/index.html'), 'utf-8');
@@ -69,7 +71,7 @@ async function createServer() {
   });
 
   app.listen(PORT, () => {
-    console.log(`🚀 SSR Server running at http://localhost:${PORT}`);
+    console.log(`🚀 ${APP_NAME} - SSR Server running at http://localhost:${PORT}`);
     console.log(`🔧 Mode: ${isProduction ? 'production' : 'development'}`);
   });
 }

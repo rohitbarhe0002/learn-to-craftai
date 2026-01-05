@@ -1,5 +1,3 @@
-
-
 import { logError, logDebug } from './logger.js';
 
 /**
@@ -11,11 +9,9 @@ import { logError, logDebug } from './logger.js';
  */
 export function parseAIResponse(text) {
   try {
-    // Try direct JSON parse first
     return JSON.parse(text);
   } catch (parseError) {
     logDebug('Direct JSON parse failed, attempting extraction', { error: parseError.message });
-    // If direct parse fails, try to extract JSON from text
     const jsonMatch = text.match(/\{[\s\S]*\}/);
     if (jsonMatch) {
       try {

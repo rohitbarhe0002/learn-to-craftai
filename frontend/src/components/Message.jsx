@@ -28,7 +28,6 @@ export function ErrorMessage({ errorText }) {
 export function AssistantMessage({ data, allMessages = [] }) {
     const assistantContent = [];
     
-    // Handle download report response - Simple inline style
     if (data.type === 'download_report') {
         const handleDownload = () => {
             const reportData = extractReportData(allMessages);
@@ -52,7 +51,6 @@ export function AssistantMessage({ data, allMessages = [] }) {
         );
     }
     
-    // Check if this is a fallback response (has 'message' field but not download_report type)
     if (data.message && !data.type) {
         assistantContent.push(
             <div key="fallback" className="disease-description">{data.message}</div>
@@ -74,7 +72,6 @@ export function AssistantMessage({ data, allMessages = [] }) {
             );
         }
     }
-    // Check if this is a conversational response (has 'response' field)
     else if (data.response && typeof data.response === 'string') {
         assistantContent.push(
             <div 
@@ -84,7 +81,6 @@ export function AssistantMessage({ data, allMessages = [] }) {
             />
         );
     } else {
-        // Render structured disease information
         if (data.disease) {
             assistantContent.push(
                 <div key="disease" className="disease-heading">{data.disease}</div>
@@ -97,7 +93,6 @@ export function AssistantMessage({ data, allMessages = [] }) {
             );
         }
         
-        // Causes section
         if (data.causes && Array.isArray(data.causes) && data.causes.length > 0) {
             assistantContent.push(
                 <div key="causes" className="section">
@@ -111,7 +106,6 @@ export function AssistantMessage({ data, allMessages = [] }) {
             );
         }
         
-        // Medicines section
         if (data.commonly_used_medicines && Array.isArray(data.commonly_used_medicines) && data.commonly_used_medicines.length > 0) {
             assistantContent.push(
                 <div key="medicines" className="section">
@@ -128,7 +122,6 @@ export function AssistantMessage({ data, allMessages = [] }) {
             );
         }
         
-        // If no structured data found, show fallback
         const hasStructuredData = data.disease || data.description || 
             (data.causes && data.causes.length > 0) || 
             (data.commonly_used_medicines && data.commonly_used_medicines.length > 0);

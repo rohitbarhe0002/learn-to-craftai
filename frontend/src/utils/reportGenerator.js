@@ -74,11 +74,9 @@ export function generateHealthReport(reportData) {
         },
 
         content: [
-            // Divider line
             { canvas: [{ type: 'line', x1: 0, y1: 0, x2: 515, y2: 0, lineWidth: 2, lineColor: '#10a37f' }] },
             { text: '', margin: [0, 5] },
 
-            // Diagnosis Section (PDF: Disease name only, description hidden)
             diagnosis.disease ? {
                 style: 'sectionBox',
                 table: {
@@ -255,9 +253,6 @@ export function generateHealthReport(reportData) {
     pdfMake.createPdf(docDefinition).download(`Health_Report_${currentDate.replace(/\s/g, '_')}.pdf`);
 }
 
-/**
- * Generate a random consultation ID
- */
 function generateConsultationId() {
     return 'HC-' + Date.now().toString(36).toUpperCase() + '-' + Math.random().toString(36).substr(2, 4).toUpperCase();
 }
@@ -271,10 +266,7 @@ function generateConsultationId() {
 function formatCauseForPDF(cause) {
     if (!cause) return 'Unknown';
     
-    // If already short (less than 50 chars), return as is
     if (cause.length <= 50) return cause;
-    
-    // Try to extract the main point (first part before comma, colon, or dash)
     const separators = [',', ':', ' - ', ' – '];
     for (const sep of separators) {
         if (cause.includes(sep)) {
@@ -285,7 +277,6 @@ function formatCauseForPDF(cause) {
         }
     }
     
-    // If no separator found, truncate at 50 chars at word boundary
     const words = cause.split(' ');
     let result = '';
     for (const word of words) {
@@ -304,7 +295,6 @@ function formatCauseForPDF(cause) {
 function extractDosageFromNote(note) {
     if (!note) return 'As prescribed by doctor';
     
-    // Look for common dosage patterns
     const dosagePatterns = [
         /(\d+\s*mg)/i,
         /(\d+\s*ml)/i,
@@ -329,7 +319,6 @@ function extractDosageFromNote(note) {
 function extractDurationFromNote(note) {
     if (!note) return 'As advised by doctor';
     
-    // Look for common duration patterns
     const durationPatterns = [
         /(\d+\s*days?)/i,
         /(\d+\s*weeks?)/i,
@@ -366,19 +355,16 @@ export function extractReportData(messages, conversationId = null) {
         ]
     };
 
-    // Extract data from messages
     messages.forEach(msg => {
         if (msg.type === 'assistant' && msg.data) {
             const data = msg.data;
             
-            // Extract disease info
             if (data.disease && !reportData.diagnosis.disease) {
                 reportData.diagnosis.disease = data.disease;
                 reportData.diagnosis.description = data.description || '';
                 reportData.diagnosis.causes = data.causes || [];
             }
             
-            // Extract medicines with all available details for PDF formatting
             if (data.commonly_used_medicines && Array.isArray(data.commonly_used_medicines)) {
                 data.commonly_used_medicines.forEach(med => {
                     if (!reportData.medicines.find(m => m.name === med.name)) {

@@ -5,13 +5,7 @@ import { existsSync, mkdirSync } from 'fs';
 import { config } from '../utils/config.js';
 import { logInfo, logError, logDebug } from '../utils/logger.js';
 
-// Get project root directory (one level up from db/)
 const PROJECT_ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
-
-/**
- * Database connection instance
- * Singleton pattern for database access
- */
 let db = null;
 
 /**
@@ -21,12 +15,10 @@ let db = null;
  */
 export async function initDatabase() {
   return new Promise((resolve, reject) => {
-    // Resolve database path relative to project root
     const dbPath = config.dbPath.startsWith('./') 
       ? join(PROJECT_ROOT, config.dbPath.replace('./', ''))
       : config.dbPath;
     
-    // Ensure directory exists for the database file
     const dbDir = dirname(dbPath);
     if (dbDir !== '.' && !existsSync(dbDir)) {
       try {
@@ -46,7 +38,6 @@ export async function initDatabase() {
         return;
       }
 
-      // Create conversations table
       db.run(`
         CREATE TABLE IF NOT EXISTS conversations (
           id TEXT PRIMARY KEY,
@@ -63,7 +54,6 @@ export async function initDatabase() {
         }
         logDebug('Conversations table created');
 
-        // Create messages table
         db.run(`
           CREATE TABLE IF NOT EXISTS messages (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -83,7 +73,6 @@ export async function initDatabase() {
           }
           logDebug('Messages table created');
 
-          // Create index for faster queries
           db.run(`
             CREATE INDEX IF NOT EXISTS idx_messages_conversation_id 
             ON messages(conversation_id, created_at)
@@ -117,7 +106,6 @@ export async function createConversation(conversationId, userDetails = null) {
     }
 
     if (userDetails && (userDetails.name || userDetails.age || userDetails.gender)) {
-      // Create conversation with user details
       db.run(
         `INSERT OR IGNORE INTO conversations (id, name, age, gender) VALUES (?, ?, ?, ?)`,
         [
@@ -137,7 +125,6 @@ export async function createConversation(conversationId, userDetails = null) {
       }
       );
     } else {
-      // Create conversation without user details
       db.run(
         `INSERT OR IGNORE INTO conversations (id) VALUES (?)`,
         [conversationId],
