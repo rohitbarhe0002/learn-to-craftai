@@ -107,11 +107,15 @@ POSSIBLE INTENTS
 8. "medicine_and_dosage_request"
    - User is asking which medicine to take AND how much dose to take
 9. "download_report" - User wants to download, save, export, or get a PDF/report of their consultation
+10. "greeting" - User is saying hello, hi, hey, or starting casual conversation
 
 
 ========================
 INTENT DETECTION RULES
 ========================
+- If user message is a greeting like:
+  "hi", "hello", "hey", "hii", "good morning", "good evening"
+  → greeting
 - If user asks "what is X" or "tell me about X" for the first time → disease_information
 - If user asks about symptoms, causes, medicines of previously discussed disease → follow_up_question
 - If user asks about cost, price, lifestyle, diet, exercise → cost_or_lifestyle
@@ -266,6 +270,47 @@ export function getDownloadReportResponse() {
     note: 'This report contains a summary of your consultation for your personal records.'
   };
 }
+
+/**
+ * Builds greeting response prompt for casual conversation
+ * Used when user sends greetings like hi, hello, how are you, etc.
+ * @param {string} userMessage - The user's greeting message
+ * @param {Object|null} userDetails - Optional user details (name, age, gender)
+ * @returns {string} Greeting prompt for AI
+ */
+export function buildGreetingPrompt(userMessage, userDetails = null) {
+  let prompt = `You are a friendly AI Health Assistant.
+
+Your task:
+- Respond naturally to greetings and normal conversation
+- Be warm, polite, and welcoming
+- If the user greets you, greet them back
+- If the user asks "how are you", respond politely
+- Encourage the user to ask a health-related question
+- Do NOT give medical advice unless asked
+
+${getLanguageRules()}
+${getOutputConstraints()}
+${getUserContextSection(userDetails)}
+
+========================
+RESPONSE FORMAT (STRICT JSON ONLY)
+========================
+Respond ONLY with valid JSON:
+
+{
+  "response": "<Natural, friendly greeting or conversational reply>"
+}
+
+========================
+USER MESSAGE
+========================
+${userMessage}
+`;
+
+  return prompt;
+}
+
 
 /**
  * Default fallback response when grounding is missing

@@ -3,6 +3,7 @@ import {
   buildIntentDetectionPrompt,
   buildDiseaseInformationPrompt,
   buildConversationalResponsePrompt,
+  buildGreetingPrompt,
   getFallbackResponse,
   getDownloadReportResponse 
 } from '../utils/prompts.js';
@@ -99,7 +100,10 @@ export async function processChatRequest(userMessage, conversationId = null, use
   let responsePrompt;
   let responseType;
 
-  if (detectedIntent === 'disease_information' || detectedIntent === 'new_topic') {
+  if (detectedIntent === 'greeting') {
+    responsePrompt = buildGreetingPrompt(userMessage, conversationUserDetails);
+    responseType = 'greeting';
+  } else if (detectedIntent === 'disease_information' || detectedIntent === 'new_topic') {
     responsePrompt = buildDiseaseInformationPrompt(userMessage, conversationUserDetails);
     responseType = 'disease_information';
   } else {
@@ -122,12 +126,14 @@ export async function processChatRequest(userMessage, conversationId = null, use
       detectedIntent
     );
 
-    if (!hasValidGrounding(result.groundingMetadata)) {
+    const requiresGrounding = responseType !== 'greeting';
+    
+    if (requiresGrounding && !hasValidGrounding(result.groundingMetadata)) {
       logWarn('Invalid or missing grounding metadata', { conversationId: currentConversationId });
       aiResponse = getFallbackResponse(userMessage);
       responseType = 'fallback';
     } else {
-      logDebug('Valid grounding metadata received');
+      logDebug(requiresGrounding ? 'Valid grounding metadata received' : 'Grounding skipped for greeting');
       try {
         aiResponse = parseAIResponse(result.text);
         logDebug('AI response parsed successfully');
@@ -140,6 +146,11 @@ export async function processChatRequest(userMessage, conversationId = null, use
           if (aiResponse.commonly_used_medicines) filteredResponse.commonly_used_medicines = aiResponse.commonly_used_medicines;
           aiResponse = filteredResponse;
           logDebug('Response filtered to include only required fields');
+        } else if (responseType === 'greeting') {
+          const filteredResponse = {};
+          if (aiResponse.response) filteredResponse.response = aiResponse.response;
+          aiResponse = filteredResponse;
+          logDebug('Greeting response processed');
         } else {
           const filteredResponse = {};
           if (aiResponse.response) filteredResponse.response = aiResponse.response;
