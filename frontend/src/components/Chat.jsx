@@ -2,9 +2,20 @@ import { useState, useOptimistic, useRef, useImperativeHandle, forwardRef, useLa
 import { UserMessage, AssistantMessage, ErrorMessage } from './Message';
 import TypingIndicator from './TypingIndicator';
 
-const Chat = forwardRef(function Chat({ isPending = false }, ref) {
-    const [messages, setMessages] = useState([]);
+const Chat = forwardRef(function Chat({ 
+    isPending = false, 
+    initialMessages = [],
+    loadingHistory = false 
+}, ref) {
+    const [additionalMessages, setAdditionalMessages] = useState([]);
+    const [initialMessagesLength, setInitialMessagesLength] = useState(initialMessages.length);
     const chatContainerRef = useRef(null);
+    if (initialMessages.length !== initialMessagesLength) {
+        setInitialMessagesLength(initialMessages.length);
+        setAdditionalMessages([]);
+    }
+    
+    const messages = [...initialMessages, ...additionalMessages];
     
     const [optimisticMessages, addOptimisticMessage] = useOptimistic(
         messages,
@@ -34,7 +45,7 @@ const Chat = forwardRef(function Chat({ isPending = false }, ref) {
         },
         
         addAssistantMessage: (userText, data) => {
-            setMessages(prev => [
+            setAdditionalMessages(prev => [
                 ...prev, 
                 { type: 'user', text: userText },
                 { type: 'assistant', data }
@@ -42,7 +53,7 @@ const Chat = forwardRef(function Chat({ isPending = false }, ref) {
         },
         
         addErrorMessage: (userText, errorText) => {
-            setMessages(prev => [
+            setAdditionalMessages(prev => [
                 ...prev,
                 { type: 'user', text: userText },
                 { type: 'error', errorText }
@@ -55,7 +66,13 @@ const Chat = forwardRef(function Chat({ isPending = false }, ref) {
     return (
         <main className="chat-container" ref={chatContainerRef}>
             <div className="chat-messages">
-                {!hasMessages && (
+                {loadingHistory && (
+                    <div className="loading-history">
+                        <div className="loading-spinner"></div>
+                        <p>Loading conversation...</p>
+                    </div>
+                )}
+                {!loadingHistory && !hasMessages && (
                     <div className="empty-state">
                         <div className="empty-icon">💬</div>
                         <p className="empty-text">Ask about any disease to get started</p>

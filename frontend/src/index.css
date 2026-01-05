@@ -64,7 +64,11 @@
 @layer components {
   /* App Container */
   .app-container {
-    @apply flex flex-col h-screen max-w-full mx-auto bg-bg-primary;
+    @apply flex h-screen max-w-full mx-auto bg-bg-primary;
+  }
+  /* Main Content - area beside sidebar */
+  .main-content {
+    @apply flex flex-col flex-1 min-w-0 h-screen;
   }
 
   /* Chat Form - flex container for chat + input */
@@ -72,28 +76,207 @@
     @apply flex flex-col flex-1 min-h-0;
   }
 
+  .sidebar {
+    @apply fixed left-0 top-0 h-full bg-bg-secondary border-r border-border-light flex flex-col z-[200];
+    width: 280px;
+    transform: translateX(-100%);
+    transition: transform var(--transition-slow);
+  }
+
+  .sidebar.open {
+    transform: translateX(0);
+  }
+
+  .sidebar-overlay {
+    @apply fixed inset-0 bg-black/50 z-[199];
+    animation: fadeIn 200ms ease;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  .sidebar-header {
+    @apply flex items-center justify-between gap-md p-md border-b border-border-light;
+  }
+
+  .new-chat-button {
+    @apply flex items-center gap-sm bg-bg-tertiary text-text-primary py-sm px-md rounded-md border border-border-color cursor-pointer transition-all duration-150 text-sm font-medium flex-1;
+  }
+
+  .new-chat-button:hover {
+    @apply bg-bg-hover border-text-tertiary;
+  }
+
+  .new-chat-icon {
+    @apply text-lg font-light;
+  }
+
+  .sidebar-close {
+    @apply bg-transparent border-none text-text-tertiary cursor-pointer p-xs rounded transition-colors duration-150 text-lg;
+  }
+
+  .sidebar-close:hover {
+    @apply text-text-primary bg-bg-hover;
+  }
+
+  .sidebar-content {
+    @apply flex-1 overflow-y-auto p-md;
+  }
+
+  .sidebar-group {
+    @apply mb-sm;
+  }
+
+  .sidebar-group-title {
+    @apply text-xs font-semibold text-text-tertiary uppercase tracking-wider px-sm;
+    margin-bottom: 4px;
+  }
+
+  .sidebar-list {
+    @apply list-none p-0 m-0 flex flex-col;
+  }
+
+  .sidebar-item {
+    @apply flex items-center gap-xs px-sm rounded-md cursor-pointer text-sm text-text-secondary;
+    padding-top: 6px;
+    padding-bottom: 6px;
+    border-left: 2px solid transparent;
+    transition: background-color 150ms ease, color 150ms ease;
+  }
+
+  .sidebar-item:hover {
+    @apply bg-bg-hover text-text-primary;
+  }
+
+  .sidebar-item.active {
+    @apply bg-bg-tertiary text-text-primary;
+    border-left-color: var(--accent-primary);
+  }
+
+  .sidebar-item-icon {
+    @apply text-sm flex-shrink-0;
+  }
+
+  .sidebar-item-title {
+    @apply flex-1 truncate;
+  }
+
+  .sidebar-item-menu {
+    @apply bg-transparent border-none text-text-tertiary cursor-pointer p-xs rounded opacity-0 transition-all duration-150 text-base font-bold;
+  }
+
+  .sidebar-item:hover .sidebar-item-menu {
+    @apply opacity-100;
+  }
+
+  .sidebar-item-menu:hover {
+    @apply text-text-primary bg-bg-hover;
+  }
+
+  .sidebar-loading,
+  .sidebar-error,
+  .sidebar-empty {
+    @apply flex flex-col items-center justify-center py-xl text-center text-text-tertiary text-sm;
+  }
+
+  .sidebar-error button {
+    @apply mt-md bg-bg-tertiary text-text-primary py-xs px-md rounded border border-border-color cursor-pointer text-sm;
+  }
+
+  .sidebar-error button:hover {
+    @apply bg-bg-hover;
+  }
+
+  .sidebar-empty p {
+    @apply text-xs mt-xs;
+  }
+
+  /* Sidebar Toggle Button in Header */
+  .sidebar-toggle {
+    @apply bg-transparent border-none text-text-tertiary cursor-pointer rounded transition-colors duration-150 flex items-center justify-center flex-shrink-0;
+    width: 36px;
+    height: 36px;
+  }
+
+  .sidebar-toggle:hover {
+    @apply text-text-primary bg-bg-hover;
+  }
+
+  /* Loading History State */
+  .loading-history {
+    @apply flex flex-col items-center justify-center py-2xl text-text-tertiary;
+  }
+
+  .loading-spinner {
+    @apply w-8 h-8 border-2 border-border-color border-t-accent-primary rounded-full mb-md;
+    animation: spin 1s linear infinite;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  /* Desktop Sidebar */
+  @media (min-width: 1024px) {
+    .sidebar {
+      @apply fixed;
+      transform: translateX(-100%);
+    }
+
+    .sidebar.open {
+      transform: translateX(0);
+    }
+
+    .sidebar-overlay {
+      @apply hidden;
+    }
+
+    .sidebar-close {
+      @apply hidden;
+    }
+
+    .main-content {
+      @apply flex-1;
+      margin-left: 0;
+      transition: margin-left var(--transition-slow);
+    }
+
+    .app-container.sidebar-open .main-content {
+      margin-left: 280px;
+    }
+  }
+
+  /* ===== END SIDEBAR STYLES ===== */
+
   /* Header */
   .chat-header {
-    @apply bg-bg-primary border-b border-border-light py-lg px-xl sticky top-0 z-[100];
+    @apply bg-bg-primary border-b border-border-light sticky top-0 z-[100];
+    padding: 12px 16px;
     backdrop-filter: blur(10px);
-    background: rgba(15, 15, 15, 0.8);
+    background: rgba(15, 15, 15, 0.9);
   }
 
   .header-content {
-    @apply max-w-[768px] mx-auto flex items-center justify-between gap-md;
+    @apply flex items-center gap-sm;
+    max-width: 100%;
   }
 
   .app-title {
-    @apply text-lg font-semibold text-text-primary;
-    letter-spacing: -0.02em;
+    @apply text-base font-semibold text-text-primary flex-1 text-center;
+    letter-spacing: -0.01em;
+    margin-right: 36px;
   }
 
   .disclaimer-icon {
-    @apply text-text-tertiary cursor-help transition-colors duration-150 flex items-center justify-center w-6 h-6;
+    @apply text-text-tertiary cursor-help transition-colors duration-150 flex items-center justify-center rounded;
+    width: 36px;
+    height: 36px;
   }
 
   .disclaimer-icon:hover {
-    @apply text-text-secondary;
+    @apply text-text-secondary bg-bg-hover;
   }
 
   /* Chat Container */
@@ -470,6 +653,34 @@
   .message-input::-webkit-scrollbar-thumb:hover {
     @apply bg-text-tertiary;
   }
+
+  /* Sidebar Scrollbar */
+  .sidebar-content::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .sidebar-content::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+
+  .sidebar-content::-webkit-scrollbar-thumb {
+    @apply bg-border-color rounded-full;
+  }
+
+  .sidebar-content::-webkit-scrollbar-thumb:hover {
+    @apply bg-text-tertiary;
+  }
+
+  /* Firefox scrollbar support */
+  .sidebar-content {
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-color) transparent;
+  }
+
+  .chat-container {
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-color) var(--bg-primary);
+  }
 }
 
 /* Accessibility */
@@ -501,7 +712,7 @@
 /* Responsive Design */
 @media (max-width: 768px) {
   .chat-header {
-    @apply py-md px-lg;
+    padding: 10px 12px;
   }
 
   .chat-messages {
@@ -522,13 +733,14 @@
   }
 
   .app-title {
-    @apply text-base;
+    @apply text-sm;
+    margin-right: 0;
   }
 }
 
 @media (max-width: 480px) {
   .chat-header {
-    @apply py-md px-md;
+    padding: 8px 10px;
   }
 
   .chat-messages {

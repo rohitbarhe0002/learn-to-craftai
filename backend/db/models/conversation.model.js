@@ -2,7 +2,10 @@ import {
   createConversation as dbCreateConversation,
   saveMessage as dbSaveMessage,
   getConversationHistory as dbGetConversationHistory,
-  getConversationUserDetails as dbGetConversationUserDetails
+  getConversationUserDetails as dbGetConversationUserDetails,
+  getAllConversations as dbGetAllConversations,
+  getConversationWithMessages as dbGetConversationWithMessages,
+  deleteConversation as dbDeleteConversation
 } from '../database.js';
 import { randomUUID } from 'crypto';
 
@@ -68,5 +71,32 @@ export async function saveAssistantMessage(conversationId, content, responseType
  */
 export async function getConversationHistory(conversationId, limit = 20) {
   return dbGetConversationHistory(conversationId, limit);
+}
+
+/**
+ * Gets all conversations with their titles
+ * @param {number} limit - Maximum number of conversations (default: 50)
+ * @returns {Promise<Array<{id: string, title: string, created_at: string}>>} List of conversations
+ */
+export async function getAllConversations(limit = 50) {
+  return dbGetAllConversations(limit);
+}
+
+/**
+ * Gets a conversation with all its messages
+ * @param {string} conversationId - Conversation ID
+ * @returns {Promise<Object|null>} Conversation with messages or null
+ */
+export async function getConversationWithMessages(conversationId) {
+  return dbGetConversationWithMessages(conversationId);
+}
+
+/**
+ * Deletes a conversation and all its messages
+ * @param {string} conversationId - Conversation ID
+ * @returns {Promise<boolean>} True if deleted
+ */
+export async function deleteConversation(conversationId) {
+  return dbDeleteConversation(conversationId);
 }
 
