@@ -58,9 +58,15 @@ export function validateChatRequest(body) {
  * @returns {Object} Normalized user input
  */
 export function normalizeUserInput(body) {
+  const rawMessage =
+    body.message ??
+    body.disease ??
+    '';
+
   const result = {
-    message: body.disease.trim(),
-    conversation_id: body.conversation_id || null
+    message: rawMessage.trim(),
+    conversation_id: body.conversation_id || null,
+     location: body.location || null 
   };
 
   if (!result.conversation_id && (body.name || body.age || body.gender)) {

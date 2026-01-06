@@ -1,11 +1,12 @@
-import { useState, useOptimistic, useRef, useImperativeHandle, forwardRef, useLayoutEffect } from 'react';
+import { useState, useOptimistic, useRef,startTransition, useImperativeHandle, forwardRef, useLayoutEffect } from 'react';
 import { UserMessage, AssistantMessage, ErrorMessage } from './Message';
 import TypingIndicator from './TypingIndicator';
 
 const Chat = forwardRef(function Chat({ 
     isPending = false, 
     initialMessages = [],
-    loadingHistory = false 
+    loadingHistory = false,
+    onLocationAllowed 
 }, ref) {
     const [additionalMessages, setAdditionalMessages] = useState([]);
     const [initialMessagesLength, setInitialMessagesLength] = useState(initialMessages.length);
@@ -21,7 +22,7 @@ const Chat = forwardRef(function Chat({
         messages,
         (currentMessages, optimisticMessage) => [...currentMessages, optimisticMessage]
     );
-    
+
     const scrollToBottom = () => {
         if (chatContainerRef.current) {
             setTimeout(() => {
@@ -32,26 +33,32 @@ const Chat = forwardRef(function Chat({
             }, 50);
         }
     };
-    
+
     // Auto-scroll when messages or loading state changes
     useLayoutEffect(() => {
         scrollToBottom();
     }, [optimisticMessages, isPending]);
-    
+
     // Expose methods to parent via ref
     useImperativeHandle(ref, () => ({
         addOptimisticMessage: (text) => {
             addOptimisticMessage({ type: 'user', text });
         },
-        
-        addAssistantMessage: (userText, data) => {
-            setAdditionalMessages(prev => [
-                ...prev, 
-                { type: 'user', text: userText },
-                { type: 'assistant', data }
-            ]);
-        },
-        
+
+      addAssistantMessage: (userText, data) => {
+  const messageType =
+    data?.type === 'LOCATION_REQUIRED'
+      ? 'location_request'
+      : 'assistant';
+
+  setAdditionalMessages(prev => [
+    ...prev,
+    { type: 'user', text: userText },
+    { type: messageType, data }
+  ]);
+},
+
+
         addErrorMessage: (userText, errorText) => {
             setAdditionalMessages(prev => [
                 ...prev,
@@ -60,9 +67,9 @@ const Chat = forwardRef(function Chat({
             ]);
         }
     }));
-    
+
     const hasMessages = optimisticMessages.length > 0 || isPending;
-    
+
     return (
         <main className="chat-container" ref={chatContainerRef}>
             <div className="chat-messages">
@@ -79,13 +86,13 @@ const Chat = forwardRef(function Chat({
                         <p className="empty-subtext">Example: "What is diabetes?" or "Tell me about hypertension"</p>
                     </div>
                 )}
-                
+
                 {optimisticMessages.map((message, index) => {
-                    const contentHash = message.text?.slice(0, 10) || 
-                                       message.errorText?.slice(0, 10) || 
-                                       JSON.stringify(message.data || {}).slice(0, 20);
+                    const contentHash = message.text?.slice(0, 10) ||
+                        message.errorText?.slice(0, 10) ||
+                        JSON.stringify(message.data || {}).slice(0, 20);
                     const key = `${message.type}-${index}-${contentHash}`;
-                    
+
                     switch (message.type) {
                         case 'user':
                             return <UserMessage key={key} text={message.text} />;
@@ -93,11 +100,20 @@ const Chat = forwardRef(function Chat({
                             return <ErrorMessage key={key} errorText={message.errorText} />;
                         case 'assistant':
                             return <AssistantMessage key={key} data={message.data} allMessages={optimisticMessages} />;
+                        case 'location_request':
+                            return (
+                                <AssistantMessage
+                                    key={key}
+                                    data={message.data}
+                                    allMessages={optimisticMessages}
+                                    onLocationAllowed={onLocationAllowed}
+                                />
+                            );
                         default:
                             return null;
                     }
                 })}
-                
+
                 {/* Show typing indicator when API call is pending */}
                 {isPending && <TypingIndicator />}
             </div>

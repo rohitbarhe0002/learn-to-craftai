@@ -6,13 +6,17 @@ const BACKEND_URL = typeof window !== 'undefined'
 /**
  * Send message to API and get response
  */
-export async function sendMessage(userMessage, conversationId = null) {
+export async function sendMessage(userMessage, conversationId = null, location = null) {
     const requestBody = {
         disease: userMessage.trim(),
     };
     
     if (conversationId) {
         requestBody.conversation_id = conversationId;
+    }
+    // Include location if available
+    if(location){
+        requestBody.location = location;
     }
     
     const response = await fetch(`${BACKEND_URL}/chat`, {

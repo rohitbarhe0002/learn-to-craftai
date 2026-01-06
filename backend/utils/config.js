@@ -10,7 +10,7 @@ export const config = {
   port: process.env.PORT || 3001,
   
   geminiApiKey: process.env.GEMINI_API_KEY,
-  geminiModel: 'gemini-2.5-pro',
+  geminiModel: 'gemini-2.5-flash',
   
   dbPath: process.env.DB_PATH || './data/healthchat.db',
 };

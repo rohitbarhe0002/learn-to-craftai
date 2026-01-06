@@ -410,6 +410,44 @@
     @apply text-sm text-text-tertiary italic mt-lg pt-md border-t border-border-light;
     line-height: var(--line-height);
   }
+ .allow-location-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  color: #ffffff;
+  background-color: var(--success-color);
+
+  box-sizing: border-box;
+  border: 1px solid transparent;
+
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  line-height: 1.25rem;
+
+  padding: 0.625rem 1rem;
+  border-radius: 9999px;
+
+  cursor: pointer;
+  transition: var(--transition-fast);
+  outline: none;
+}
+
+.allow-location-button:hover {
+  background-color: var(--accent-hover);
+}
+
+.allow-location-button:focus {
+  box-shadow:
+    0 0 0 4px rgba(16, 163, 127, 0.4),
+    0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.allow-location-button:active {
+  opacity: 0.9;
+}
 
   /* Download Report Styles - Simple & Minimal */
   .download-report-container {
