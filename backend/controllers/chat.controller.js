@@ -42,8 +42,11 @@ export const handleChatRequest = routeHandler(async (req, res) => {
     });
   }
 
-  const { message, conversation_id, userDetails } = normalizeUserInput(req.body);
-  const result = await processChatRequest(message, conversation_id, userDetails);
+  // Normalize user input
+  const { message, conversation_id, userDetails, location } = normalizeUserInput(req.body);
+
+  // Process chat request
+  const result = await processChatRequest(message, conversation_id, userDetails, location);
 
   logInfo('Chat request completed successfully', { 
     conversationId: result.conversation_id,

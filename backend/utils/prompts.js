@@ -102,7 +102,7 @@ POSSIBLE INTENTS
 3. "cost_or_lifestyle" - User is asking about treatment costs, lifestyle changes, diet, exercise, prevention
 4. "severity_or_duration" - User is asking about disease severity, duration, recovery time, complications
 5. "new_topic" - User is switching to a completely different disease/topic
-6. "hospital_or_doctor_recommendation" - User is asking for best hospitals, doctors, or treatment facilities
+6. "healthcare_location_search" - User is asking for nearby hospitals, doctors, clinics, or medical stores
 7. "medicine_information" - User is asking about a tablet, medicine, uses, side effects
 8. "medicine_and_dosage_request"
    - User is asking which medicine to take AND how much dose to take
@@ -123,6 +123,12 @@ INTENT DETECTION RULES
 - If user mentions a different disease than previously discussed → new_topic
 - If user asks about best hospital, doctor, clinic, or treatment place → hospital_or_doctor_recommendation
 - If user asks about any tablet, medicine, drug name, or injection → medicine_information
+- If user asks for nearby hospitals → intent = healthcare_location_search, resource_type = hospital
+- If user asks for nearby doctors or clinics → intent = healthcare_location_search, resource_type = doctor
+- If user asks for nearby medical stores or pharmacies → intent = healthcare_location_search, resource_type = pharmacy
+- If user asks for nearby hospitals, hospitals near me, clinics near me, or doctors near me
+  (with or without mentioning a disease)
+  → hospital_or_doctor_recommendation
 - If user asks:
     • "which medicine should I take?"
     • "please suggest medicine and dose"
@@ -166,6 +172,7 @@ RESPONSE FORMAT (STRICT JSON ONLY)
 Respond ONLY with valid JSON:
 {
   "intent": "<one of the intents above>",
+  "resource_type": "<hospital | doctor | pharmacy | unknown>",
   "reasoning": "<brief explanation of why this intent>"
 }`;
 

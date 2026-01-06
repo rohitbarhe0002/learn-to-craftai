@@ -44,6 +44,7 @@ export async function initDatabase() {
           name TEXT,
           age INTEGER,
           gender TEXT,
+          location TEXT,
           created_at DATETIME DEFAULT CURRENT_TIMESTAMP
         )
       `, (err) => {
@@ -203,6 +204,64 @@ export async function saveMessage(conversationId, role, content, intent = null, 
           return;
         }
         resolve();
+      }
+    );
+  });
+}
+/**
+ * Save location for a conversation
+ * @param {string} conversationId
+ * @param {{lat:number, lng:number}} location
+ */
+export async function saveConversationLocation(conversationId, location) {
+  return new Promise((resolve, reject) => {
+    if (!db) {
+      reject(new Error('Database not initialized'));
+      return;
+    }
+
+    db.run(
+      `UPDATE conversations SET location = ? WHERE id = ?`,
+      [JSON.stringify(location), conversationId],
+      (err) => {
+        if (err) {
+          logError('Error saving conversation location', err, { conversationId });
+          reject(err);
+          return;
+        }
+        resolve();
+      }
+    );
+  });
+}
+
+/**
+ * Get stored location for a conversation
+ * @param {string} conversationId
+ * @returns {Promise<{lat:number,lng:number}|null>}
+ */
+export async function getConversationLocation(conversationId) {
+  return new Promise((resolve, reject) => {
+    if (!db) {
+      reject(new Error('Database not initialized'));
+      return;
+    }
+
+    db.get(
+      `SELECT location FROM conversations WHERE id = ?`,
+      [conversationId],
+      (err, row) => {
+        if (err) {
+          logError('Error fetching conversation location', err, { conversationId });
+          reject(err);
+          return;
+        }
+
+        if (!row || !row.location) {
+          resolve(null);
+        } else {
+          resolve(JSON.parse(row.location));
+        }
       }
     );
   });
